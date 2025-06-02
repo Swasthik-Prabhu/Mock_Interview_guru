@@ -28,6 +28,7 @@ async def app_init():
         database=db,
         document_models=[ResumeInterviewQA, User]  # Add all your Beanie models here
     )
+    print("[DEBUG] Beanie initialized.")
 
 app.include_router(auth.router)
 app.include_router(user.router)
