@@ -1,4 +1,6 @@
 import React from "react";
+import { Link } from "react-router-dom";
+import { FaFileAlt } from "react-icons/fa";
 import Navbar from "../../../components/Navbar";
 import Logo from "../../../components/Logo";
 import Footer from "../../../components/Footer";
@@ -35,6 +37,20 @@ const StudentHome: React.FC = () => {
                 <img className="h-12 opacity-50 hover:opacity-100 transition-opacity" src="/company-1.svg" alt="Company 1" />
               </div>
               {/* Add more company logos here */}
+            </div>
+
+            {/* Resume Analysis Button */}
+            <div className="mt-12">
+              <Link
+                to="/resume-analysis"
+                className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300 transform hover:scale-105"
+              >
+                <FaFileAlt className="mr-2" />
+                Analyze Your Resume
+              </Link>
+              <p className="mt-2 text-sm text-gray-500">
+                Get instant AI-powered feedback on your resume
+              </p>
             </div>
           </div>
 
