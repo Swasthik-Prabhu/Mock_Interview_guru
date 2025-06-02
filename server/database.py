@@ -1,4 +1,4 @@
-from beanie import init_beanie
+from beanie import init_beanie #type:ignore
 from motor.motor_asyncio import AsyncIOMotorClient
 from core.config import settings
 from models.user import User

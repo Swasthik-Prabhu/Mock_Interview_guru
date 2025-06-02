@@ -6,15 +6,32 @@ from fastapi.security import OAuth2PasswordRequestForm
 from core.security import create_access_token
 from fastapi import HTTPException, Depends
 from models.user import User
+from routes import interview
+from models.interview_qna import ResumeInterviewQA
+from motor.motor_asyncio import AsyncIOMotorClient
+from core.config import settings
+from beanie import init_beanie #type:ignore
+
+
+
 
 app = FastAPI()
 
 @app.on_event("startup")
 async def app_init():
-    await init_db()
+    # Connect to MongoDB
+    client = AsyncIOMotorClient(settings.MONGO_URL)
+    db = client["mockinterview"]  # Select your DB name
+
+    # Initialize Beanie with your document models
+    await init_beanie(
+        database=db,
+        document_models=[ResumeInterviewQA, User]  # Add all your Beanie models here
+    )
 
 app.include_router(auth.router)
 app.include_router(user.router)
+app.include_router(interview.router)
 
 @app.get("/")
 def root():
