@@ -19,7 +19,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = (userRole: Role) => {
     setRole(userRole);
-    navigate(`/${userRole}-dashboard`);
+    navigate(`/${userRole}/dashboard`);
   };
 
   const logout = () => {

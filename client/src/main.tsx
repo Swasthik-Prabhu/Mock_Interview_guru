@@ -1,18 +1,33 @@
-// // src/main.tsx
+// import { StrictMode } from 'react';
+// import { createRoot } from 'react-dom/client';
+// import { BrowserRouter } from 'react-router-dom';
+// import './index.css';
+// import { AuthProvider } from './context/AuthContext';
+// import AppRoutes from './router/AppRoutes';
 
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom'
-import './index.css'
-import App from './App.tsx'
-import { AuthProvider } from './context/AuthContext'
+// createRoot(document.getElementById('root')!).render(
+//   <StrictMode>
+//     <BrowserRouter>
+//       <AuthProvider>
+//         <AppRoutes />
+//       </AuthProvider>
+//     </BrowserRouter>
+//   </StrictMode>
+// );
+
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import './index.css';
+import { AuthProvider } from './context/AuthContext';
+import AppRoutes from './router/AppRoutes';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <AuthProvider>
-        <App />
+        <AppRoutes />
       </AuthProvider>
     </BrowserRouter>
   </StrictMode>
-)
+);
