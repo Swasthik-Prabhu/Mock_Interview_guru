@@ -2,11 +2,10 @@ from fastapi import APIRouter, HTTPException, status, Depends
 from models.user import User
 from schemas.auth import UserCreate, UserLogin, Token
 from core.security import get_password_hash, create_access_token
-from beanie import PydanticObjectId #type: ignore
+from beanie import PydanticObjectId  # type: ignore
 from fastapi.security import OAuth2PasswordRequestForm
 
 router = APIRouter(prefix="/auth", tags=["auth"])
-
 
 @router.post("/register", response_model=Token)
 async def register(user: UserCreate):
@@ -18,12 +17,12 @@ async def register(user: UserCreate):
         name=user.name,
         email=user.email,
         hashed_password=get_password_hash(user.password),
-        role = user.role or "student",
+        role=user.role or "student",
+        institution=user.institution,  # ✅ Add institution to model
     )
     await user_obj.insert()
     access_token = create_access_token(data={"sub": str(user_obj.id), "role": user_obj.role})
     return {"access_token": access_token}
-
 
 @router.post("/login", response_model=Token)
 async def login(user: UserLogin):
@@ -37,5 +36,3 @@ async def login(user: UserLogin):
 
     access_token = create_access_token(data={"sub": str(user_obj.id), "role": user_obj.role})
     return {"access_token": access_token}
-
-
