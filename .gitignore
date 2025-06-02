@@ -1,4 +1,6 @@
 /client/node_modules
 /client/build
 
-
+/server/__pycache__/
+/server/core/__pycache__/
+/server/venv/
