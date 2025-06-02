@@ -12,6 +12,7 @@ from models.interview_qna import ResumeInterviewQA
 from motor.motor_asyncio import AsyncIOMotorClient
 from core.config import settings
 from beanie import init_beanie #type:ignore
+from routes import scraper
 
 
 
@@ -38,10 +39,12 @@ async def app_init():
         database=db,
         document_models=[ResumeInterviewQA, User]  # Add all your Beanie models here
     )
+    print("[DEBUG] Beanie initialized.")
 
 app.include_router(auth.router)
 app.include_router(user.router)
 app.include_router(interview.router)
+app.include_router(scraper.router, prefix="/api", tags=["Scraper"])
 
 @app.get("/")
 def root():

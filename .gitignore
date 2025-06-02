@@ -11,6 +11,6 @@
 / server/models/__pycache__/interview_qna.cpython-311.pyc
 /server/routes/__pycache__/interview.cpython-311.pyc
 /server/.env
-/server/models/__pycache__/user.cpython-312.pyc
-/server/routes/__pycache__/auth.cpython-312.pyc
-/server/schemas/__pycache__/auth.cpython-312.pyc
+/server/routes/__pycache__/scraper.cpython-311.pyc
+/server/schemas/__pycache__/scraper_schema.cpython-311.pyc
+/server/services/__pycache__/
