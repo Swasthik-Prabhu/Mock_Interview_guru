@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from database import init_db
 from routes import auth
 from routes import user
@@ -11,11 +12,21 @@ from models.interview_qna import ResumeInterviewQA
 from motor.motor_asyncio import AsyncIOMotorClient
 from core.config import settings
 from beanie import init_beanie #type:ignore
+from routes import scraper
 
 
 
 
 app = FastAPI()
+
+# Configure CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  # React dev server default port
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.on_event("startup")
 async def app_init():
@@ -33,6 +44,7 @@ async def app_init():
 app.include_router(auth.router)
 app.include_router(user.router)
 app.include_router(interview.router)
+app.include_router(scraper.router, prefix="/api", tags=["Scraper"])
 
 @app.get("/")
 def root():
