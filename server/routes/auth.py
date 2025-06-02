@@ -2,7 +2,8 @@ from fastapi import APIRouter, HTTPException, status, Depends
 from models.user import User
 from schemas.auth import UserCreate, UserLogin, Token
 from core.security import get_password_hash, create_access_token
-from beanie import PydanticObjectId
+from beanie import PydanticObjectId #type: ignore
+from fastapi.security import OAuth2PasswordRequestForm
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -36,3 +37,5 @@ async def login(user: UserLogin):
 
     access_token = create_access_token(data={"sub": str(user_obj.id), "role": user_obj.role})
     return {"access_token": access_token}
+
+
