@@ -1,5 +1,6 @@
-import React, { useState, useRef } from 'react';
-import { FaCloudUploadAlt, FaFileAlt, FaCheckCircle, FaTimesCircle, FaTrash } from 'react-icons/fa';
+import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { FaCloudUploadAlt, FaFileAlt, FaCheckCircle, FaTimesCircle, FaTrash, FaChevronDown, FaChevronRight, FaEye } from 'react-icons/fa';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { Input } from "../components/ui/input";
@@ -9,17 +10,45 @@ interface FileWithPreview extends File {
   preview?: string;
 }
 
+interface Resume {
+  interview_id: string;
+  filename: string;
+  upload_date: string;
+  status: string;
+}
+
 const ResumeAnalysis: React.FC = () => {
   const [file, setFile] = useState<FileWithPreview | null>(null);
   const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
+  const [resumes, setResumes] = useState<Resume[]>([]);
+  const [isAccordionOpen, setIsAccordionOpen] = useState(false);
   const [analysis, setAnalysis] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Fetch existing resumes when component mounts
+    fetchResumes();
+  }, []);
+
+  const fetchResumes = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/api/interview/resumes');
+      if (response.ok) {
+        const data = await response.json();
+        setResumes(data.resumes);
+      }
+    } catch (error) {
+      console.error('Error fetching resumes:', error);
+    }
+  };
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
       setFile(selectedFile);
       setUploadStatus('idle');
+      setAnalysis(null); // Reset analysis when new file is selected
     }
   };
 
@@ -31,20 +60,34 @@ const ResumeAnalysis: React.FC = () => {
       const formData = new FormData();
       formData.append('resume', file);
 
-      const response = await fetch('http://localhost:8000/api/analyze-resume', {
+      const response = await fetch('http://localhost:8000/api/interview/upload-resume', {
         method: 'POST',
         body: formData,
       });
 
       if (!response.ok) {
-        throw new Error('Resume analysis failed');
+        throw new Error('Resume upload failed');
       }
 
       const result = await response.json();
-      setAnalysis(result);
+      
+      // Store interview_id in localStorage
+      localStorage.setItem('currentInterviewId', result.interview_id);
+      
+      // Fetch analysis for the uploaded resume
+      const analysisResponse = await fetch(`http://localhost:8000/api/interview/analysis/${result.interview_id}`);
+      if (!analysisResponse.ok) {
+        throw new Error('Failed to fetch analysis');
+      }
+      
+      const analysisResult = await analysisResponse.json();
+      setAnalysis(analysisResult);
       setUploadStatus('success');
+      
+      // Refresh the resumes list
+      fetchResumes();
     } catch (error) {
-      console.error('Error analyzing resume:', error);
+      console.error('Error uploading resume:', error);
       setUploadStatus('error');
     }
   };
@@ -52,8 +95,27 @@ const ResumeAnalysis: React.FC = () => {
   const handleCancel = () => {
     setFile(null);
     setUploadStatus('idle');
+    setAnalysis(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
+    }
+  };
+
+  const handleViewQuestions = async (interviewId: string) => {
+    try {
+      // Fetch analysis for the selected resume
+      const analysisResponse = await fetch(`http://localhost:8000/api/interview/analysis/${interviewId}`);
+      if (!analysisResponse.ok) {
+        throw new Error('Failed to fetch analysis');
+      }
+      
+      const analysisResult = await analysisResponse.json();
+      setAnalysis(analysisResult);
+      
+      localStorage.setItem('currentInterviewId', interviewId);
+      navigate(`/interview-questions/${interviewId}`);
+    } catch (error) {
+      console.error('Error fetching analysis:', error);
     }
   };
 
@@ -69,7 +131,7 @@ const ResumeAnalysis: React.FC = () => {
           </p>
 
           {/* File Upload Area */}
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-2xl mx-auto mb-8">
             <div className="bg-white p-8 rounded-lg shadow-lg border-2 border-dashed border-gray-300">
               <div className="space-y-6">
                 {!file ? (
@@ -131,16 +193,60 @@ const ResumeAnalysis: React.FC = () => {
                 {uploadStatus === 'uploading' && (
                   <div className="flex items-center justify-center text-indigo-600">
                     <FaCloudUploadAlt className="animate-bounce mr-2" />
-                    <span>Analyzing resume...</span>
+                    <span>Uploading resume...</span>
                   </div>
                 )}
                 {uploadStatus === 'error' && (
                   <div className="flex items-center justify-center text-red-600">
                     <FaTimesCircle className="mr-2" />
-                    <span>Analysis failed. Please try again.</span>
+                    <span>Upload failed. Please try again.</span>
                   </div>
                 )}
               </div>
+            </div>
+          </div>
+
+          {/* My Resumes Accordion */}
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+              <button
+                className="w-full px-6 py-4 flex items-center justify-between bg-gray-50 hover:bg-gray-100 transition-colors"
+                onClick={() => setIsAccordionOpen(!isAccordionOpen)}
+              >
+                <h3 className="text-lg font-medium">My Resumes</h3>
+                {isAccordionOpen ? <FaChevronDown /> : <FaChevronRight />}
+              </button>
+              
+              {isAccordionOpen && (
+                <div className="p-6">
+                  {resumes.length === 0 ? (
+                    <p className="text-gray-500 text-center">No resumes uploaded yet</p>
+                  ) : (
+                    <div className="space-y-4">
+                      {resumes.map((resume) => (
+                        <div
+                          key={resume.interview_id}
+                          className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                        >
+                          <div>
+                            <p className="font-medium">{resume.filename}</p>
+                            <p className="text-sm text-gray-500">
+                              Uploaded on {new Date(resume.upload_date).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => handleViewQuestions(resume.interview_id)}
+                            className="flex items-center px-4 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-700"
+                          >
+                            <FaEye className="mr-2" />
+                            Look into
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
