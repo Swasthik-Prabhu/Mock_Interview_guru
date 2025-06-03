@@ -4,6 +4,8 @@ import Login from './pages/Login'
 import InstitutionLayout from './pages/dashboards/institution/InstitutionLayout'
 import InstitutionHome from './pages/dashboards/institution/InstitutionHome'
 import Settings from './pages/dashboards/institution/Settings'
+import ResumeAnalysis from './pages/ResumeAnalysis'
+import StudentHome from './pages/dashboards/student/StudentHome'
 
 function App() {
   return (
@@ -11,6 +13,8 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Login />} />
+          <Route path="/student" element={<StudentHome />} />
+          <Route path="/resume-analysis" element={<ResumeAnalysis />} />
           
           {/* Institution Routes */}
           <Route path="/institution" element={<InstitutionLayout />}>

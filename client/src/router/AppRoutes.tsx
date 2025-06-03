@@ -6,11 +6,13 @@ import AdminLayout from "../layouts/AdminLayout";
 import StudentHome from "../pages/dashboards/student/StudentHome";
 import InstitutionHome from "../pages/dashboards/institution/InstitutionHome";
 import AdminHome from "../pages/dashboards/admin/AdminHome";
+import ResumeAnalysis from "../pages/ResumeAnalysis";
 
 const AppRoutes: React.FC = () => {
   return (
     <Routes>
       <Route path="/" element={<Login />} />
+      <Route path="/resume-analysis" element={<ResumeAnalysis />} />
       <Route element={<StudentLayout />}>
         <Route path="/student/dashboard" element={<StudentHome />} />
       </Route>
