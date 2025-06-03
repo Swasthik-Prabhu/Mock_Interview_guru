@@ -10,6 +10,7 @@ class User(Document):
     email: EmailStr
     hashed_password: str
     role: Literal["student", "admin","institution"] = "student"
+    institution: str
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
     class Settings:
